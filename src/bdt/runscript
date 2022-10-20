@@ -1,0 +1,11 @@
+#!/bin/bash
+
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install wheel==0.37.1
+pip install -r requirements.txt
+uuid=`uuidgen`
+sed -e "s/\"UUID\"/\"${uuid::8}\"/" config-in.json > config.json
+python3 bdt.py config.json
+deactivate

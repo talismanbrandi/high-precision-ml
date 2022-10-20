@@ -1,0 +1,28 @@
+{
+    "model_type": "dnn",
+    "input_shape": 8,
+    "var_y": "yRT",
+    "depth": 8,
+    "width": 100,
+    "data_path": "/home/apaul/beegfs/high-precision-ml/data/",
+    "scaled": "log",
+    "lr_decay_type": "const",
+    "initial_lr": 0.001,
+    "final_lr": 1e-06,
+    "decay_steps": 1000000,
+    "validation_split": 0.2,
+    "batch_size": 512,
+    "steps_per_epoch": 4000,
+    "patience": 10,
+    "monitor": "val_mse",
+    "loss": "mse",
+    "metrics": [
+        "mse",
+        "mae"
+    ],
+    "verbose": 0,
+    "base_directory": "",
+    "epochs": 10000,
+    "sample-size": 10000000,
+    "model-uuid": "UUID"
+}
