@@ -143,15 +143,15 @@ def runBDT(df, config):
                                  n_estimators=config["n_estimators"], 
                                  random_state=config["random_state"], 
                                  gamma=config["gamma"],
-                                 tree_method=config["tree_method"])
+                                 tree_method=config["tree_method"],
+                                 early_stopping_rounds=config["early_stopping_rounds"],
+                                 eval_metric=config["eval_metric"])
     
     logging.info(' running the BDT training')
     start = time.time()
     regressor = regressor.fit(x_train, 
-                              y_train, 
-                              early_stopping_rounds=config["early_stopping_rounds"], 
+                              y_train,
                               eval_set=eval_set,
-                              eval_metric=config["eval_metric"], 
                               verbose=False)
     config["fit_time"] = timediff(time.time() - start)
     
@@ -171,7 +171,7 @@ def post_process(regressor, x_test, y_test, config):
     
     # save model
     logging.info(' saving the trees')
-    regressor.save_model(config['directory']+'/bdt-'+config['input_shape']+'D-'+str(config["max_depth"])+'-'+str(config["learning_rate"])+'-'+'{:.1f}'.format(config["sample-size"]/1.e6)+'M.xgb.ubj')
+    regressor.save_model(config['directory']+'/bdt-'+str(config['input_shape'])+'D-'+str(config["max_depth"])+'-'+str(config["learning_rate"])+'-'+'{:.1f}'.format(config["sample-size"]/1.e6)+'M.xgb.ubj')
     
     # end time
     config["end_time"] = time.strftime("%Y-%m-%d %H:%M:%S %z", time.localtime())
