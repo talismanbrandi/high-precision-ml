@@ -24,7 +24,7 @@ The configuration file needs to be specified as such:
         "mae"
     ],
     "verbose": 0,
-    "base_directory": '',
+    "base_directory": "",
     "epochs": 10000,
     "sample-size": 10000000,
     "model-uuid": "UUID"
