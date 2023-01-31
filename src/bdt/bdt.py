@@ -143,15 +143,15 @@ def runBDT(df, config):
                                  n_estimators=config["n_estimators"], 
                                  random_state=config["random_state"], 
                                  gamma=config["gamma"],
-                                 tree_method=config["tree_method"])
+                                 tree_method=config["tree_method"],
+                                 early_stopping_rounds=config["early_stopping_rounds"],
+                                 eval_metric=config["eval_metric"])
     
     logging.info(' running the BDT training')
     start = time.time()
     regressor = regressor.fit(x_train, 
-                              y_train, 
-                              early_stopping_rounds=config["early_stopping_rounds"], 
+                              y_train,
                               eval_set=eval_set,
-                              eval_metric=config["eval_metric"], 
                               verbose=False)
     config["fit_time"] = timediff(time.time() - start)
     
@@ -164,6 +164,10 @@ def post_process(regressor, x_test, y_test, config):
     y_pred = regressor.predict(x_test)
     config["accuracy_score"] = 100*regressor.score(x_test, y_test)
     logging.info(' Accuracy Score: {:4.6f}% '.format(config["accuracy_score"]))
+    
+    # get the number of estimators
+    dump_list = regressor.get_booster().get_dump()
+    config["num_trees"] = len(dump_list)
 
     # evaluate training with plots
     logging.info(' printing training evaluation plots')
@@ -171,7 +175,7 @@ def post_process(regressor, x_test, y_test, config):
     
     # save model
     logging.info(' saving the trees')
-    regressor.save_model(config['directory']+'/bdt-'+config['input_shape']+'D-'+str(config["max_depth"])+'-'+str(config["learning_rate"])+'-'+'{:.1f}'.format(config["sample-size"]/1.e6)+'M.xgb.ubj')
+    regressor.save_model(config['directory']+'/bdt-'+str(config['input_shape'])+'D-'+str(config["max_depth"])+'-'+str(config["learning_rate"])+'-'+'{:.1f}'.format(config["sample-size"]/1.e6)+'M.xgb.ubj')
     
     # end time
     config["end_time"] = time.strftime("%Y-%m-%d %H:%M:%S %z", time.localtime())
@@ -213,7 +217,12 @@ def main():
         config['model-uuid'] = m_uuid
     else:
         m_uuid = config['model-uuid']
-    dir_name = config['base_directory']+'bdt-xgb-'+str(config['input_shape'])+'D-'+str(config['var_y'])+'-'+m_uuid
+    
+    if config['base_directory'] != '':
+        base_directory = config['base_directory']+'/' if config['base_directory'][-1] != '/' else config['base_directory']
+        dir_name = base_directory+'bdt-xgb-'+str(config['input_shape'])+'D-'+str(config['var_y'])+'-'+m_uuid
+    else:
+        dir_name = 'bdt-xgb-'+str(config['input_shape'])+'D-'+str(config['var_y'])+'-'+m_uuid
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
     config['directory'] = dir_name
